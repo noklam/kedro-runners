@@ -10,6 +10,14 @@ from itertools import chain
 
 from pluggy import PluginManager
 class BacktrackRunner(SequentialRunner):
+    """
+    1. Find out what datasets are missing (DryRunner?)
+    2. Backtrack these node with _find_nodes_to_resume_from
+    3. Normal kedro run
+
+    Args:
+        SequentialRunner (_type_): _description_
+    """
 
     start_node_names = _find_nodes_to_resume_from(
         pipeline=pipeline,
