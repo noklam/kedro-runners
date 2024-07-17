@@ -71,13 +71,13 @@ class SoftFailRunner(SequentialRunner):
                 logger.error(f"Skipped node: {str(new_nodes)}")
                 logger.error(e)
             # decrement load counts and release any data sets we've finished with
-            for data_set in node.inputs:
-                load_counts[data_set] -= 1
-                if load_counts[data_set] < 1 and data_set not in pipeline.inputs():
-                    catalog.release(data_set)
-            for data_set in node.outputs:
-                if load_counts[data_set] < 1 and data_set not in pipeline.outputs():
-                    catalog.release(data_set)
+            for dataset in node.inputs:
+                load_counts[dataset] -= 1
+                if load_counts[dataset] < 1 and dataset not in pipeline.inputs():
+                    catalog.release(dataset)
+            for dataset in node.outputs:
+                if load_counts[dataset] < 1 and dataset not in pipeline.outputs():
+                    catalog.release(dataset)
 
             logger.info(
                 "Completed %d out of %d tasks",
@@ -87,7 +87,7 @@ class SoftFailRunner(SequentialRunner):
         self._summary(pipeline, skip_nodes, fail_nodes)
 
         if skip_nodes:
-            self._suggest_resume_scenario(pipeline, done_nodes)
+            self._suggest_resume_scenario(pipeline, done_nodes, catalog)
 
     def _update_skip_nodes(self, node, pipeline, skip_nodes=None) -> Set[Node]:
         """Traverse the DAG with Breath-First-Search (BFS) to find all descendent nodes.
@@ -149,7 +149,7 @@ class SoftFailRunner(SequentialRunner):
 
         # Check which datasets used in the pipeline are in the catalog or match
         # a pattern in the catalog
-        registered_ds = [ds for ds in pipeline.data_sets() if ds in catalog]
+        registered_ds = [ds for ds in pipeline.datasets() if ds in catalog]
 
         # Check if there are any input datasets that aren't in the catalog and
         # don't match a pattern in the catalog.
@@ -161,9 +161,8 @@ class SoftFailRunner(SequentialRunner):
             )
 
         free_outputs = pipeline.outputs() - set(catalog.list())
-        unregistered_ds = pipeline.data_sets() - set(catalog.list())
-        for ds_name in unregistered_ds:
-            catalog.add(ds_name, self.create_default_data_set(ds_name))
+        unregistered_ds = pipeline.datasets() - set(catalog.list())
+
 
         if self._is_async:
             self._logger.info(
