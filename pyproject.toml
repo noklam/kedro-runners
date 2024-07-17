@@ -5,7 +5,9 @@ description = "An extensino of Kedro Runner"
 authors = [
     {name = "Nok Lam Chan", email = "mediumnok@gmail.com"},
 ]
-dependencies = []
+dependencies = [
+    "kedro>=0.19.0",
+]
 requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "Apache2"}
