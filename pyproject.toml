@@ -1,7 +1,7 @@
 [project]
 name = "kedro-runners"
 version = "0.1.0"
-description = "An extensino of Kedro Runner"
+description = "An extension of Kedro Runner"
 authors = [
     {name = "Nok Lam Chan", email = "mediumnok@gmail.com"},
 ]
